@@ -1,0 +1,361 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DBATU SGPA & CGPA Calculator</title>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary-color: #2962ff;
+            --secondary-color: #455a64;
+            --background: #f5f5f5;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: 'Roboto', sans-serif;
+            background-color: var(--background);
+            line-height: 1.6;
+            padding: 1rem;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: white;
+            padding: 1.5rem;
+            border-radius: 12px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+
+        h2 {
+            color: var(--primary-color);
+            margin-bottom: 1.25rem;
+            font-size: clamp(1.5rem, 5vw, 1.8rem);
+        }
+
+        .input-group {
+            margin: 1rem 0;
+            display: flex;
+            flex-direction: column;
+            gap: 0.75rem;
+        }
+
+        label {
+            font-weight: 500;
+            color: var(--secondary-color);
+            font-size: clamp(0.9rem, 4vw, 1rem);
+        }
+
+        select, input {
+            padding: 0.75rem;
+            border: 1px solid #ddd;
+            border-radius: 6px;
+            font-size: clamp(0.85rem, 3.5vw, 1rem);
+            width: 100%;
+            min-height: 48px;
+            transition: border-color 0.3s ease;
+        }
+
+        select:focus, input:focus {
+            outline: none;
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 2px rgba(41, 98, 255, 0.1);
+        }
+
+        table {
+            width: 100%;
+            margin: 1.25rem 0;
+            border-collapse: collapse;
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+            table-layout: fixed;
+        }
+
+        th, td {
+            padding: 0.75rem;
+            text-align: left;
+            border-bottom: 1px solid #eee;
+            font-size: clamp(0.75rem, 3vw, 1rem);
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+
+        th {
+            background-color: var(--primary-color);
+            color: white;
+            font-weight: 500;
+        }
+
+        tr:nth-child(even) {
+            background-color: #f8f9fa;
+        }
+
+        button {
+            background-color: var(--primary-color);
+            color: white;
+            padding: 0.75rem 1.5rem;
+            border: none;
+            border-radius: 6px;
+            font-size: clamp(0.9rem, 4vw, 1rem);
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+            margin: 1rem 0;
+            min-height: 48px;
+            width: 100%;
+            max-width: 300px;
+        }
+
+        button:hover {
+            background-color: #1565c0;
+        }
+
+        .result-box {
+            background: #f8f9fa;
+            padding: 1.25rem;
+            border-radius: 8px;
+            margin: 1.25rem 0;
+        }
+
+        .result-box h3 {
+            color: var(--secondary-color);
+            margin-bottom: 0.5rem;
+            font-size: clamp(0.95rem, 4vw, 1.1rem);
+        }
+
+        .result-value {
+            font-size: clamp(1.25rem, 5vw, 1.5rem);
+            color: var(--primary-color);
+            font-weight: 700;
+        }
+
+        hr {
+            margin: 1.5rem 0;
+            border: 0;
+            border-top: 1px solid #eee;
+        }
+
+        /* Responsive adjustments */
+        @media (min-width: 768px) {
+            .container {
+                padding: 2rem;
+            }
+
+            .input-group {
+                flex-direction: row;
+                align-items: center;
+                gap: 1rem;
+            }
+
+            select, input {
+                width: auto;
+                min-width: 100px;
+            }
+
+            button {
+                width: auto;
+            }
+
+            th, td {
+                padding: 1rem;
+            }
+        }
+
+        /* Mobile table adjustments */
+        @media (max-width: 600px) {
+            table {
+                min-width: 0;
+            }
+
+            th, td {
+                padding: 0.5rem;
+            }
+
+            td select, td input {
+                font-size: clamp(0.75rem, 2.5vw, 0.9rem);
+                padding: 0.5rem;
+                min-height: 40px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h2>DBATU SGPA Calculator</h2>
+        
+        <div class="input-group">
+            <label for="subjectCount">Number of Subjects:</label>
+            <input type="number" id="subjectCount" min="1" max="10" value="5" onchange="generateInputs()">
+        </div>
+
+        <table>
+            <thead>
+                <tr>
+                    <th>Subject</th>
+                    <th>Credits</th>
+                    <th>Grade</th>
+                </tr>
+            </thead>
+            <tbody id="subjectTable"></tbody>
+        </table>
+
+        <button onclick="calculateSGPA()">Calculate SGPA</button>
+        
+        <div class="result-box">
+            <h3>SGPA</h3>
+            <div class="result-value" id="sgpaResult">-</div>
+            <div style="margin-top: 1rem;">
+                <h3>Total Grade Points: <span id="totalGradePoints">-</span></h3>
+                <h3>Total Credits: <span id="totalCredits">-</span></h3>
+            </div>
+        </div>
+
+        <hr>
+
+        <h2>DBATU CGPA Calculator</h2>
+        
+        <div class="input-group">
+            <label for="semesterCount">Number of Semesters:</label>
+            <input type="number" id="semesterCount" min="1" max="8" value="1" onchange="generateCGPAInputs()">
+        </div>
+
+        <table>
+            <thead>
+                <tr>
+                    <th>Semester</th>
+                    <th>SGPA</th>
+                    <th>Total Credits</th>
+                </tr>
+            </thead>
+            <tbody id="cgpaTable"></tbody>
+        </table>
+
+        <button onclick="calculateCGPA()">Calculate CGPA</button>
+        
+        <div class="result-box">
+            <h3>CGPA</h3>
+            <div class="result-value" id="cgpaResult">-</div>
+        </div>
+    </div>
+
+    <script>
+        const gradePoints = {
+            "EX": 10.0, "AA": 9.0, "AB": 8.5, "BB": 8.0,
+            "BC": 7.5, "CC": 7.0, "CD": 6.5, "DD": 6.0,
+            "DE": 5.5, "EE": 5.0, "FF": 0.0, "-": 0.0
+        };
+
+        function generateInputs() {
+            let subjectCount = document.getElementById("subjectCount").value;
+            let tableBody = document.getElementById("subjectTable");
+            tableBody.innerHTML = "";
+
+            for (let i = 0; i < subjectCount; i++) {
+                let row = `<tr>
+                    <td data-label="Subject">Subject ${i + 1}</td>
+                    <td data-label="Credits">
+                        <select class="credit" onchange="updateGradeDropdown(${i})">
+                            <option value="1">1</option>
+                            <option value="2">2</option>
+                            <option value="3" selected>3</option>
+                            <option value="4">4</option>
+                            <option value="5">5</option>
+                            <option value="0">Audit Subject</option>
+                        </select>
+                    </td>
+                    <td data-label="Grade">
+                        <select class="grade">
+                            ${Object.keys(gradePoints).filter(g => g !== "-").map(grade => `<option value="${grade}">${grade}</option>`).join("")}
+                        </select>
+                    </td>
+                </tr>`;
+                tableBody.innerHTML += row;
+            }
+        }
+
+        function updateGradeDropdown(index) {
+            let creditDropdowns = document.querySelectorAll(".credit");
+            let gradeDropdowns = document.querySelectorAll(".grade");
+
+            if (creditDropdowns[index].value === "0") {
+                gradeDropdowns[index].innerHTML = `<option value="-">-</option>`;
+            } else {
+                gradeDropdowns[index].innerHTML = Object.keys(gradePoints)
+                    .filter(g => g !== "-")
+                    .map(grade => `<option value="${grade}">${grade}</option>`)
+                    .join("");
+            }
+        }
+
+        function calculateSGPA() {
+            let credits = document.querySelectorAll(".credit");
+            let grades = document.querySelectorAll(".grade");
+
+            let totalCredits = 0, totalPoints = 0;
+
+            grades.forEach((grade, index) => {
+                let gradeValue = gradePoints[grade.value];
+                let creditValue = parseFloat(credits[index].value);
+
+                if (creditValue !== 0) { 
+                    totalPoints += gradeValue * creditValue;
+                    totalCredits += creditValue;
+                }
+            });
+
+            let sgpa = totalCredits > 0 ? (totalPoints / totalCredits).toFixed(2) : "0.00";
+            document.getElementById("sgpaResult").innerText = sgpa;
+            document.getElementById("totalGradePoints").innerText = totalPoints.toFixed(2);
+            document.getElementById("totalCredits").innerText = totalCredits;
+        }
+
+        function generateCGPAInputs() {
+            let semesterCount = document.getElementById("semesterCount").value;
+            let tableBody = document.getElementById("cgpaTable");
+            tableBody.innerHTML = "";
+
+            for (let i = 0; i < semesterCount; i++) {
+                let row = `<tr>
+                    <td data-label="Semester">Semester ${i + 1}</td>
+                    <td data-label="SGPA"><input type="number" class="sgpaInput" step="0.01" min="0" max="10" value="0"></td>
+                    <td data-label="Total Credits"><input type="number" class="creditInput" min="1" max="30" value="20"></td>
+                </tr>`;
+                tableBody.innerHTML += row;
+            }
+        }
+
+        function calculateCGPA() {
+            let sgpaInputs = document.querySelectorAll(".sgpaInput");
+            let creditInputs = document.querySelectorAll(".creditInput");
+
+            let totalCredits = 0, weightedSGPA = 0;
+
+            sgpaInputs.forEach((sgpaInput, index) => {
+                let sgpaValue = parseFloat(sgpaInput.value);
+                let creditValue = parseFloat(creditInputs[index].value);
+
+                if (creditValue > 0) {
+                    weightedSGPA += sgpaValue * creditValue;
+                    totalCredits += creditValue;
+                }
+            });
+
+            let cgpa = totalCredits > 0 ? (weightedSGPA / totalCredits).toFixed(2) : "0.00";
+            document.getElementById("cgpaResult").innerText = cgpa;
+        }
+
+        window.onload = function() {
+            generateInputs();
+            generateCGPAInputs();
+        };
+    </script>
+</body>
+</html>
