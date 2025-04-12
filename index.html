@@ -143,6 +143,103 @@
             border-top: 1px solid #eee;
         }
 
+        /* Help Button and Modal Styles */
+        .help-button {
+            background-color: #007bff;
+            margin: 0.5rem 0;
+        }
+
+        .help-button:hover {
+            background-color: #0056b3;
+        }
+
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            z-index: 1000;
+            overflow-y: auto;
+        }
+
+        .modal-content {
+            background: white;
+            margin: 2rem auto;
+            padding: 1.5rem;
+            border-radius: 10px;
+            max-width: 800px;
+            position: relative;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+        }
+
+        .close-button {
+            position: absolute;
+            top: 1rem;
+            right: 1rem;
+            font-size: 1.5rem;
+            cursor: pointer;
+            color: #333;
+        }
+
+        /* Info Container Styles */
+        .info-container {
+            font-family: 'Roboto', sans-serif;
+            line-height: 1.6;
+            color: #333;
+        }
+
+        .info-container h2 {
+            color: #0056b3;
+            border-bottom: 2px solid #0056b3;
+            padding-bottom: 5px;
+            font-size: clamp(1.4rem, 4vw, 1.6rem);
+        }
+
+        .info-container h3 {
+            color: #007bff;
+            font-size: clamp(1.1rem, 3.5vw, 1.2rem);
+            margin: 1rem 0 0.5rem;
+        }
+
+        .info-container p {
+            margin-bottom: 0.75rem;
+            font-size: clamp(0.9rem, 3vw, 1rem);
+        }
+
+        .info-container ul {
+            margin: 0.5rem 0 1rem 1.5rem;
+            font-size: clamp(0.9rem, 3vw, 1rem);
+        }
+
+        .formula-box {
+            background: #e3f2fd;
+            padding: 0.75rem;
+            border-left: 4px solid #007bff;
+            font-weight: 500;
+            font-size: clamp(0.9rem, 3vw, 1rem);
+            margin: 0.5rem 0;
+        }
+
+        .example-box {
+            background: #fff3cd;
+            padding: 0.75rem;
+            border-left: 4px solid #ff9800;
+            margin: 0.5rem 0;
+        }
+
+        .disclaimer-box {
+            background: #ffebee;
+            padding: 0.75rem;
+            border-left: 4px solid #d32f2f;
+            color: #d32f2f;
+            font-weight: 500;
+            margin: 0.5rem 0;
+            font-size: clamp(0.9rem, 3vw, 1rem);
+        }
+
         /* Responsive adjustments */
         @media (min-width: 768px) {
             .container {
@@ -167,6 +264,11 @@
             th, td {
                 padding: 1rem;
             }
+
+            .modal-content {
+                padding: 2rem;
+                margin: 3rem auto;
+            }
         }
 
         /* Mobile table adjustments */
@@ -184,12 +286,20 @@
                 padding: 0.5rem;
                 min-height: 40px;
             }
+
+            .modal-content {
+                margin: 1rem;
+                padding: 1rem;
+            }
         }
     </style>
 </head>
 <body>
     <div class="container">
-        <h2>DBATU SGPA Calculator</h2>
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
+            <h2>DBATU SGPA Calculator</h2>
+            <button class="help-button" onclick="openModal()">Need Help?</button>
+        </div>
         
         <div class="input-group">
             <label for="subjectCount">Number of Subjects:</label>
@@ -209,7 +319,7 @@
 
         <button onclick="calculateSGPA()">Calculate SGPA</button>
         
-        <div class="result-box">
+        <div class="result-box" id="sgpaResultBox">
             <h3>SGPA</h3>
             <div class="result-value" id="sgpaResult">-</div>
             <div style="margin-top: 1rem;">
@@ -240,9 +350,77 @@
 
         <button onclick="calculateCGPA()">Calculate CGPA</button>
         
-        <div class="result-box">
+        <div class="result-box" id="cgpaResultBox">
             <h3>CGPA</h3>
             <div class="result-value" id="cgpaResult">-</div>
+        </div>
+    </div>
+
+    <!-- Modal for Help Content -->
+    <div id="helpModal" class="modal">
+        <div class="modal-content">
+            <span class="close-button" onclick="closeModal()">&times;</span>
+            <div class="info-container">
+                <h2>📌 How to Use the DBATU SGPA & CGPA Calculator</h2>
+                
+                <h3>📊 Steps to Calculate SGPA</h3>
+                <p>1️⃣ Write the number of subjects in the semester for which you want to calculate SGPA</p>
+                <p>2️⃣ Enter the credits and select the corresponding grade for each subject.</p>
+                <p>3️⃣ Click the <b>"Calculate SGPA"</b> button to get your Semester Grade Point Average (SGPA).</p>
+
+                <h3>📝 SGPA Calculation Formula</h3>
+                <div class="formula-box">
+                    <b>SGPA = (Sum of (Credit × Grade Point) for all subjects) / (Sum of Total Credits)</b>
+                </div>
+
+                <h3>🎯 Example for SGPA Calculation (As per DBATU Grading System)</h3>
+                <div class="example-box">
+                    Consider a student with 5 subjects and the following details:  
+                    <ul>
+                        <li>📌 Subject 1: Credits = 3, Grade = AA (9.0)</li>
+                        <li>📌 Subject 2: Credits = 4, Grade = BB (8.0)</li>
+                        <li>📌 Subject 3: Credits = 3, Grade = BC (7.5)</li>
+                        <li>📌 Subject 4: Credits = 3, Grade = AB (8.5)</li>
+                        <li>📌 Subject 5: Credits = 2, Grade = CC (7.0)</li>
+                    </ul>
+                    <p>Total Grade Points = (3×9.0) + (4×8.0) + (3×7.5) + (3×8.5) + (2×7.0) = 121</p>
+                    <p>Total Credits = 3 + 4 + 3 + 3 + 2 = 15</p>
+                    <p><strong>✅ SGPA = 121 / 15 = 8.07</strong></p>
+                </div>
+
+                <h3>📈 Steps to Calculate CGPA</h3>
+                <p>1️⃣ Enter the number of semesters you have completed.</p>
+                <p>2️⃣ Enter the SGPA and total credits earned in each semester.</p>
+                <p>3️⃣ Click the <b>"Calculate CGPA"</b> button to get your Cumulative Grade Point Average (CGPA).</p>
+
+                <h2>📖 Understanding SGPA & CGPA Calculation</h2>
+                
+                <h3>🔢 CGPA Calculation Formula</h3>
+                <div class="formula-box">
+                    <b>CGPA = (Sum of (SGPA × Semester Credits) for all semesters) / (Sum of Total Credits)</b>
+                </div>
+
+                <h3>📌 Example for CGPA Calculation</h3>
+                <div class="example-box">
+                    Consider a student who has completed 3 semesters with the following SGPA and credits:  
+                    <ul>
+                        <li>🎓 Semester 1: SGPA = 8.0, Credits = 20</li>
+                        <li>🎓 Semester 2: SGPA = 7.5, Credits = 22</li>
+                        <li>🎓 Semester 3: SGPA = 8.2, Credits = 21</li>
+                    </ul>
+                    <p>Total Weighted SGPA = (8.0×20) + (7.5×22) + (8.2×21) = 497.2</p>
+                    <p>Total Credits = 20 + 22 + 21 = 63</p>
+                    <p><strong>✅ CGPA = 497.2 / 63 = 7.89</strong></p>
+                </div>
+
+                <h2>👨‍💻 About the Creator</h2>
+                <p><b>Manish Prajapati</b>, the Creator of this tool, is passionate about building intuitive and useful web applications for students. This SGPA & CGPA calculator was developed with accuracy and ease of use in mind to help DBATU students quickly compute their grades. Your feedback and support are always appreciated! 🚀</p>
+
+                <h2>⚠️ Disclaimer</h2>
+                <div class="disclaimer-box">
+                    <p>🚨 This calculator is designed for educational purposes only. While every effort has been made to ensure accuracy, the final grading should be verified with official university records. DBATU's grading policies may change, so always cross-check with official sources.</p>
+                </div>
+            </div>
         </div>
     </div>
 
@@ -315,6 +493,9 @@
             document.getElementById("sgpaResult").innerText = sgpa;
             document.getElementById("totalGradePoints").innerText = totalPoints.toFixed(2);
             document.getElementById("totalCredits").innerText = totalCredits;
+
+            // Scroll to SGPA result
+            document.getElementById("sgpaResultBox").scrollIntoView({ behavior: 'smooth' });
         }
 
         function generateCGPAInputs() {
@@ -350,6 +531,26 @@
 
             let cgpa = totalCredits > 0 ? (weightedSGPA / totalCredits).toFixed(2) : "0.00";
             document.getElementById("cgpaResult").innerText = cgpa;
+
+            // Scroll to CGPA result
+            document.getElementById("cgpaResultBox").scrollIntoView({ behavior: 'smooth' });
+        }
+
+        // Modal functions
+        function openModal() {
+            document.getElementById("helpModal").style.display = "block";
+        }
+
+        function closeModal() {
+            document.getElementById("helpModal").style.display = "none";
+        }
+
+        // Close modal when clicking outside
+        window.onclick = function(event) {
+            const modal = document.getElementById("helpModal");
+            if (event.target === modal) {
+                closeModal();
+            }
         }
 
         window.onload = function() {
